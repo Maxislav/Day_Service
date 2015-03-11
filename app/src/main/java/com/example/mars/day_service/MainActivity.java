@@ -13,11 +13,13 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
+
 
 public class MainActivity extends ActionBarActivity {
 
     TextView textView;
-    MyReceiver myReceiver;
+    static MyReceiver myReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,10 +36,8 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     protected void onStart() {
-        myReceiver = new MyReceiver();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(MyService.MY_ACTION);
-        registerReceiver(myReceiver, intentFilter);
+        unregisterMyReceiver();
+        onCreateMyReceiver();
         super.onStart();
     }
 
@@ -64,26 +64,51 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
+
     @Override
-    protected void onStop() {
-        // unregisterReceiver(myReceiver);
+    protected void onStop()   {
         Log.w("MyApp", "onStop");
-        try {
-            unregisterReceiver(myReceiver);
-        }catch (IllegalArgumentException e){
-
-        }
-
+        unregisterMyReceiver();
         super.onStop();
+        // unregisterReceiver(myReceiver);
+        //Log.w("MyApp", "unregisterReceiver onStop method");
+
+
+        /*try {
+            unregisterReceiver(myReceiver);
+            Log.w("MyApp", "unregisterReceiver onStop method");
+        }catch (IllegalArgumentException e){
+            Log.w("MyApp", "IllegalArgumentException onStop method");
+        }*/
+
+
     }
 
-    public void onClickStart(View v) {
-        //Start our own service
+    public void onClickStart(View v){
+        onStart();
         Intent intent = new Intent(this, MyService.class);
         startService(intent);
 
     }
 
+    private void onCreateMyReceiver(){
+        myReceiver = new MyReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(MyService.MY_ACTION);
+        registerReceiver(myReceiver, intentFilter);
+    }
+    private void unregisterMyReceiver(){
+        try {
+            if(myReceiver!=null){
+                unregisterReceiver(myReceiver);
+                myReceiver = null;
+                Log.w("MyApp", "unregisterReceiver unregisterMyReceiver method");
+            }
+        }catch (IllegalArgumentException e){
+            Log.w("MyApp", "IllegalArgumentException unregisterMyReceiver method");
+        }
+    }
     public void onClickStop(View v) {
        // unregisterReceiver(myReceiver);
         try {
@@ -92,6 +117,7 @@ public class MainActivity extends ActionBarActivity {
 
         }
         stopService(new Intent(this, MyService.class));
+        textView.setText("Сервис разрушен");
     }
 
 

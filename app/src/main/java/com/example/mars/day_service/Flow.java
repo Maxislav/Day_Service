@@ -5,38 +5,44 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.widget.TextView;
 
-public class Flow extends Thread{
-    TextView textView;
-    Activity activity;
-    Resources res;
+public class Flow extends Thread {
     MyService service;
     final static String MY_ACTION = "MY_ACTION";
-    Flow(MyService service){
+
+    Flow(MyService service) {
         super("Второй поток");
         this.service = service;
-     //   this.textView = textView;
-      //  this.activity = activity;
-       // res = this.activity.getResources();
+
+        setTextView(R.string.app_name + "");
         System.out.println("Создан второй поток " + this);
-        start(); // Запускаем поток
+        //start(); // Запускаем поток
     }
 
     public void run() {
         try {
-            for (int i = 0; i < 60; i++) {
+            int i = 0;
+            setTextView("Второй поток старт");
+            Thread.sleep(1000);
+
+            while (i < 60) {
+                i++;
                 System.out.println("Второй поток: " + i);
                 setTextView("Второй поток: " + i);
                 Thread.sleep(1000);
             }
+            setTextView(R.string.flow_stop + "");
         } catch (InterruptedException e) {
             System.out.println("Второй поток прерван");
-            setTextView(res.getString(R.string.flow_stop));
+            Thread.currentThread().interrupt();
         }
         System.out.println("Второй поток завершён");
-        setTextView(res.getString(R.string.flow_end));
     }
 
-    private void setTextView(String text){
+    public void stopFlow() {
+        this.interrupt();
+    }
+
+    private void setTextView(String text) {
 
         Intent intent = new Intent();
         intent.setAction(MY_ACTION);
