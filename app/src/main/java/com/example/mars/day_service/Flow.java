@@ -21,16 +21,16 @@ public class Flow extends Thread {
     public void run() {
         try {
             int i = 0;
-            setTextView("Второй поток старт");
+            setTextView("Cтарт");
             Thread.sleep(1000);
 
-            while (i < 60) {
+            while (true) {
                 i++;
                 System.out.println("Второй поток: " + i);
-                setTextView("Второй поток: " + i);
+                setTextView("" + i);
                 Thread.sleep(1000);
             }
-            setTextView(R.string.flow_stop + "");
+            //setTextView(R.string.flow_stop + "");
         } catch (InterruptedException e) {
             System.out.println("Второй поток прерван");
             Thread.currentThread().interrupt();
